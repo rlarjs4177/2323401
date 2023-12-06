@@ -1,0 +1,61 @@
+<!-- friendlist.ejs -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>친구 목록</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+<body>
+  <%- include('menu.html') %> 
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">친구 목록</h1>
+        <!-- 친구 목록 테이블 -->
+        <table class="table table-hover table-striped text-center" style="border: 1px solid;">
+          <thead>
+            <tr>
+              <th>친구이름</th>
+              <th>삭제</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 서버에서 받아온 데이터로 반복해서 친구 목록 생성 -->
+            <% for(let i = 0; i < data.length; i++){ %>
+              <tr>
+                <!-- 친구 아이디 -->
+                <td><%= data[i].friendId %></td>
+                <!-- 삭제 버튼 -->
+                <td><button class='delete btn btn-outline-danger' data-id='<%= data[i]._id %>'>삭제</button></td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+    </div>
+    <!-- 삭제 버튼 클릭 이벤트 처리 스크립트 -->
+    <!-- jQuery 라이브러리 추가 -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+      $('.delete').click(function (e) {
+        // 클릭된 삭제 버튼의 data-id로 삭제할 게시물의 _id를 가져옴
+        let sid = e.target.dataset.id;
+        let item = $(this);
+        // 서버로 삭제 요청을 보냄
+        $.ajax({
+          type: 'post',
+          url: '/deletefriend',
+          data: { _id: sid }
+        }).done(function (result) {
+          // 응답에 성공했을 때, 해당 행을 삭제
+          item.closest('tr').remove();
+        }).fail(function (xhr, textStatus, errorThrown) {
+          // 응답에 실패했을 때
+          console.log('친구 삭제 실패');
+          console.log(xhr, textStatus, errorThrown);
+        })
+      })
+    </script>
+  <!-- 부트스트랩 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+</body>
+</html>
